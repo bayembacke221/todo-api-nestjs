@@ -57,6 +57,7 @@ Cette documentation détaille une API de gestion de tâches (Todo API) développ
 </p>
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+
 ## Configuration initiale
 
 Pour démarrer le projet, suivez ces étapes :
@@ -73,6 +74,9 @@ cd todo_app
 
 # Installer les dépendances pour la validation
 npm install class-validator class-transformer
+
+# Run the app
+npm run start
 ```
 
 ## Structure du projet
