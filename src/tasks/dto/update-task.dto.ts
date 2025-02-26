@@ -4,14 +4,14 @@ import { TaskStatus } from '../entities/task-status.enum';
 export class UpdateTaskDto {
   @IsOptional()
   @IsString()
-  @MinLength(3)
-  title?: string;
+  @MinLength(3, { message: 'Le titre doit contenir au moins 3 caractères' })
+  readonly title?: string;
 
   @IsOptional()
   @IsString()
-  description?: string;
+  readonly description?: string;
 
   @IsOptional()
-  @IsEnum(TaskStatus)
-  status?: TaskStatus;
+  @IsEnum(TaskStatus, { message: 'Statut invalide' })
+  readonly status?: TaskStatus;
 }

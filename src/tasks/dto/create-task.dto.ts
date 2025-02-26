@@ -1,11 +1,22 @@
-import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class CreateTaskDto {
-  @IsNotEmpty()
   @IsString()
-  @MinLength(3)
-  title: string;
+  @IsNotEmpty({ message: 'Le titre ne peut pas être vide' })
+  @MinLength(3, { message: 'Le titre doit contenir au moins 3 caractères' })
+  readonly title: string;
 
   @IsString()
-  description: string;
+  @IsOptional()
+  readonly description?: string;
+
+  @IsOptional()
+  @IsNumber()
+  readonly userId?: number;
 }
