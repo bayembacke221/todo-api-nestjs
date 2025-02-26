@@ -2,63 +2,35 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './entities/task.entity';
-import { TaskStatus } from './entities/task-status.enum';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class TasksService {
-  private tasks: Task[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(Task)
+    private tasksRepository: Repository<Task>,
+  ) {}
 
-  findAll(): Task[] {
-    return this.tasks;
+  findAll(): Promise<Task[]> {
+    return this.tasksRepository.find({ relations: ['user'] });
   }
-
-  findOne(id: number): Task {
-    const task = this.tasks.find((task) => task.id === id);
+  async findOne(id: number): Promise<Task> {
+    const task = await this.tasksRepository.findOne({ where: { id } });
     if (!task) {
-      throw new NotFoundException(`Task with ID "${id}" not found`);
+      throw new NotFoundException(`Task with ID ${id} not found`);
     }
     return task;
   }
-
-  create(createTaskDto: CreateTaskDto): Task {
-    const { title, description } = createTaskDto;
-
-    const task: Task = {
-      id: this.idCounter++,
-      title,
-      description,
-      status: TaskStatus.OPEN,
-      createdAt: new Date(),
-    };
-
-    this.tasks.push(task);
-    return task;
+  async create(createTaskDto: CreateTaskDto): Promise<Task> {
+    const task = this.tasksRepository.create(createTaskDto);
+    return this.tasksRepository.save(task);
   }
-
-  update(id: number, updateTaskDto: UpdateTaskDto): Task {
-    const task = this.findOne(id);
-
-    if (updateTaskDto.title) {
-      task.title = updateTaskDto.title;
-    }
-
-    if (updateTaskDto.description) {
-      task.description = updateTaskDto.description;
-    }
-
-    if (updateTaskDto.status) {
-      task.status = updateTaskDto.status;
-    }
-
-    return task;
+  async update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
+    await this.tasksRepository.update(id, updateTaskDto);
+    return this.findOne(id);
   }
-
-  remove(id: number): void {
-    const taskIndex = this.tasks.findIndex((task) => task.id === id);
-    if (taskIndex === -1) {
-      throw new NotFoundException(`Task with ID "${id}" not found`);
-    }
-    this.tasks.splice(taskIndex, 1);
+  async remove(id: number): Promise<void> {
+    await this.tasksRepository.delete(id);
   }
 }
